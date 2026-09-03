@@ -1,0 +1,172 @@
+export type PortfolioCategory = "residential" | "commercial" | "exterior" | "lobby";
+
+export type PortfolioItem = {
+  id: string;
+  title: string;
+  category: PortfolioCategory;
+  image: string;
+  alt: string;
+  descriptor?: string;
+  width: number;
+  height: number;
+};
+
+export const portfolioCategories: ReadonlyArray<{ id: PortfolioCategory; label: string }> = [
+  { id: "residential", label: "Residential" },
+  { id: "commercial", label: "Commercial / Hospitality" },
+  { id: "exterior", label: "Exteriors" },
+  { id: "lobby", label: "Lobbies" },
+];
+
+export const portfolioItems: ReadonlyArray<PortfolioItem> = [
+  {
+    id: "contemporary-media-lounge",
+    title: "Contemporary Media Lounge",
+    category: "residential",
+    image: "/images/namo-webp/2.webp",
+    alt: "3D visualization of a contemporary media lounge with a textured television wall, blue seating and gold pendant lights",
+    descriptor: "Layered lighting · Textured surfaces · Cool accents",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "childrens-bedroom",
+    title: "Children's Bedroom",
+    category: "residential",
+    image: "/images/namo-webp/4.webp",
+    alt: "3D visualization of a children's bedroom with a study area, timber framing and soft green wall panels",
+    descriptor: "Timber details · Soft colour · Functional planning",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "tailored-bedroom",
+    title: "Tailored Bedroom",
+    category: "residential",
+    image: "/images/namo-webp/5.webp",
+    alt: "3D visualization of a tailored bedroom with integrated timber storage, neutral upholstery and framed artwork",
+    descriptor: "Integrated storage · Warm timber · Quiet contrast",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "open-plan-dining",
+    title: "Open-Plan Dining",
+    category: "residential",
+    image: "/images/namo-webp/DINING.webp",
+    alt: "3D visualization of an open-plan dining space with a timber table, marble surfaces and recessed ceiling lighting",
+    descriptor: "Marble surfaces · Timber joinery · Linear lighting",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "warm-living-room",
+    title: "Warm Living Room",
+    category: "residential",
+    image: "/images/namo-webp/living 2.webp",
+    alt: "3D visualization of a warm living room with layered ceiling lighting, timber panelling and neutral seating",
+    descriptor: "Warm timber · Soft lighting · Layered depth",
+    width: 1920,
+    height: 1080,
+  },
+  {
+    id: "integrated-living-suite",
+    title: "Integrated Living Suite",
+    category: "residential",
+    image: "/images/namo-webp/living 3.webp",
+    alt: "3D visualization of an integrated living suite with a television wall, wardrobe storage and polished flooring",
+    descriptor: "Custom joinery · Reflective surfaces · Clean geometry",
+    width: 1920,
+    height: 1080,
+  },
+  {
+    id: "window-side-lounge",
+    title: "Window-Side Lounge",
+    category: "residential",
+    image: "/images/namo-webp/LIVING.webp",
+    alt: "3D visualization of a window-side lounge with dark seating, timber wall panels and a sculptural pendant light",
+    descriptor: "Daylight · Dark upholstery · Warm panelling",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "modern-bedroom",
+    title: "Modern Bedroom",
+    category: "residential",
+    image: "/images/namo-webp/mbed.webp",
+    alt: "3D visualization of a modern bedroom with a blue upholstered bed, patterned wall panels and full-height curtains",
+    descriptor: "Upholstered details · Patterned panels · Soft daylight",
+    width: 1356,
+    height: 762,
+  },
+  {
+    id: "hospitality-bar",
+    title: "Hospitality Bar",
+    category: "commercial",
+    image: "/images/Neha-maam-bar-webp/2 .jpg.webp",
+    alt: "3D visualization of a hospitality bar with illuminated bottle displays, timber counters and suspended globe lights",
+    descriptor: "Warm illumination · Dark finishes · Layered display",
+    width: 3492,
+    height: 1970,
+  },
+  {
+    id: "indoor-outdoor-lounge",
+    title: "Indoor–Outdoor Lounge",
+    category: "commercial",
+    image: "/images/Neha-maam-bar-webp/6.webp",
+    alt: "3D visualization of a hospitality lounge with curved seating, perforated screens and an open terrace edge",
+    descriptor: "Curved seating · Filtered daylight · Perforated screens",
+    width: 2361,
+    height: 1801,
+  },
+  {
+    id: "entertainment-interior",
+    title: "Entertainment Interior",
+    category: "commercial",
+    image: "/images/Neha-maam-bar-webp/9.webp",
+    alt: "3D visualization of an entertainment interior with a sculptural purple feature wall and dark reflective finishes",
+    descriptor: "Feature lighting · Reflective surfaces · Dramatic contrast",
+    width: 3500,
+    height: 1910,
+  },
+  {
+    id: "high-rise-exterior-day",
+    title: "High-Rise Exterior — Day",
+    category: "exterior",
+    image: "/images/exterior-webp/Day View_03.webp",
+    alt: "Daytime architectural visualization of a high-rise tower with a glazed facade and landscaped urban setting",
+    descriptor: "Glazed facade · Urban context · Daylight",
+    width: 4000,
+    height: 4000,
+  },
+  {
+    id: "high-rise-exterior-night",
+    title: "High-Rise Exterior — Night",
+    category: "exterior",
+    image: "/images/exterior-webp/Night View_02.webp",
+    alt: "Night architectural visualization of an illuminated high-rise tower within a city skyline",
+    descriptor: "Facade lighting · City context · Evening atmosphere",
+    width: 4000,
+    height: 4000,
+  },
+  {
+    id: "lift-lobby",
+    title: "Lift Lobby",
+    category: "lobby",
+    image: "/images/lobby-webp/2.0.webp",
+    alt: "3D visualization of a lift lobby with bronze-toned wall panels, patterned screens and warm concealed lighting",
+    descriptor: "Bronze tones · Patterned screens · Concealed light",
+    width: 2000,
+    height: 1667,
+  },
+  {
+    id: "residential-corridor",
+    title: "Residential Corridor",
+    category: "lobby",
+    image: "/images/lobby-webp/3.0.webp",
+    alt: "3D visualization of a residential corridor with polished stone walls, timber doors and recessed ceiling lights",
+    descriptor: "Polished stone · Warm timber · Rhythmic lighting",
+    width: 2000,
+    height: 1667,
+  },
+];
