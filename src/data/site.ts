@@ -1,9 +1,9 @@
+import { imageById } from "./image-manifest";
+
 export const navigation = [
-  { label: "About", href: "#about" },
+  { label: "Work", href: "#projects" },
   { label: "Services", href: "#services" },
-  { label: "Projects", href: "#projects" },
-  { label: "Founder", href: "#founder" },
-  { label: "Reviews", href: "#reviews" },
+  { label: "Studio", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -23,12 +23,5 @@ export const founder = {
 };
 
 export const heroImages = {
-  primary: {
-    src: "/images/Neha-maam-bar-webp/1 .jpg.webp",
-    alt: "Detailed hospitality interior visualization with a sculptural illuminated bar",
-  },
-  detail: {
-    src: "/images/exterior-webp/Night View_01.webp",
-    alt: "Night-time architectural visualization of a high-rise exterior",
-  },
+  primary: imageById("hospitalityBarHero"),
 };

@@ -8,32 +8,47 @@ import { ArrowLink } from "@/components/ui/arrow-link";
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
+  const wasOpen = useRef(false);
   const openButton = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY;
-      const movingDown = y > lastY.current + 4;
-      const movingUp = y < lastY.current - 4;
-      setScrolled(y > 24);
-      if (movingDown && y > 180 && !menuOpen) setHidden(true);
-      if (movingUp || y < 80) setHidden(false);
-      lastY.current = y;
+      setScrolled(window.scrollY > 24);
     };
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [menuOpen]);
+  }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    if (menuOpen) closeButton.current?.focus();
-    return () => { document.body.style.overflow = ""; };
+    const page = document.querySelector("main");
+    const footer = document.querySelector("footer");
+    const previousOverflow = document.body.style.overflow;
+
+    if (menuOpen) {
+      wasOpen.current = true;
+      document.body.style.overflow = "hidden";
+      page?.setAttribute("inert", "");
+      footer?.setAttribute("inert", "");
+      closeButton.current?.focus({ preventScroll: true });
+    } else {
+      document.body.style.overflow = previousOverflow;
+      page?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
+      if (wasOpen.current) {
+        openButton.current?.focus({ preventScroll: true });
+        wasOpen.current = false;
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      page?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
+    };
   }, [menuOpen]);
 
   useEffect(() => {
@@ -41,7 +56,6 @@ export function SiteHeader() {
       if (!menuOpen) return;
       if (event.key === "Escape") {
         setMenuOpen(false);
-        openButton.current?.focus();
         return;
       }
       if (event.key !== "Tab" || !menu.current) return;
@@ -68,7 +82,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className={`site-header${scrolled ? " is-scrolled" : ""}${hidden ? " is-hidden" : ""}`}>
+      <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
         <div className="site-container site-header__inner">
           <Wordmark light={!scrolled} />
           <nav className="desktop-nav" aria-label="Primary navigation">
@@ -79,10 +93,10 @@ export function SiteHeader() {
             ref={openButton}
             className="menu-trigger"
             type="button"
-            onClick={() => setMenuOpen(true)}
+            onClick={() => setMenuOpen((open) => !open)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            aria-label="Open navigation menu"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
           >
             <span>Menu</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg>
@@ -95,6 +109,9 @@ export function SiteHeader() {
         id="mobile-menu"
         className={`mobile-menu${menuOpen ? " is-open" : ""}`}
         aria-hidden={!menuOpen}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
       >
         <div className="site-container mobile-menu__inner">
           <div className="mobile-menu__header">
@@ -103,7 +120,7 @@ export function SiteHeader() {
               ref={closeButton}
               className="menu-trigger menu-trigger--light"
               type="button"
-              onClick={() => { closeMenu(); openButton.current?.focus(); }}
+              onClick={closeMenu}
               tabIndex={menuOpen ? 0 : -1}
               aria-label="Close navigation menu"
             >

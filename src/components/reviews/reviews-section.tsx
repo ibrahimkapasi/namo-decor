@@ -12,21 +12,22 @@ export function ReviewsSection({ result }: { result: ReviewsResult }) {
   useEffect(() => {
     if (!section.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const context = gsap.context(() => {
-      gsap.timeline({ scrollTrigger: { trigger: section.current, start: "top 72%" }, defaults: { ease: "power3.out" } })
-        .from(".reviews-summary > *", { y: 24, opacity: 0, stagger: .08, duration: .65 })
-        .from(".reviews-stage", { y: 28, opacity: 0, duration: .72 }, "-=.35");
+      gsap.timeline({ scrollTrigger: { trigger: section.current, start: "top 74%", once: true }, defaults: { ease: "power3.out" } })
+        .from(".reviews-summary > *", { y: 18, opacity: 0, stagger: .06, duration: .6 })
+        .from(".reviews-stage", { y: 18, opacity: 0, duration: .64 }, "-=.34");
     }, section);
     return () => context.revert();
   }, []);
   const hasPlace = result.status === "ready" || result.status === "empty";
+  const hasReviews = result.status === "ready";
+
   return (
-    <section id="reviews" ref={section} className="reviews-section" aria-labelledby="reviews-title">
-      <div className="reviews-trust"><span>The work speaks visually.</span><p>The experience matters<br />just as much.</p></div>
+    <section id="reviews" ref={section} className={`reviews-section${hasReviews ? "" : " reviews-section--fallback"}`} aria-labelledby="reviews-title">
       <div className="site-container reviews-layout">
         <aside className="reviews-summary">
-          <span>05 / Shared experiences</span><h2 id="reviews-title">Trust, in<br /><em>their words.</em></h2>
-          {hasPlace && typeof result.rating === "number" && <div className="rating-summary"><strong>{result.rating.toFixed(1)}</strong><div><span aria-label={`${result.rating} out of 5 stars`}>★★★★★</span><p>{result.reviewCount ? `${result.reviewCount} Google reviews` : "Google reviews"}</p></div></div>}
-          <div className="google-attribution"><img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" referrerPolicy="no-referrer" /><span>Maps</span>{hasPlace && <a href={result.googleMapsUri} target="_blank" rel="noreferrer">View Namo Decor on Google Maps ↗</a>}</div>
+          <span>06 / Shared experiences</span><h2 id="reviews-title">Trust, in<br /><em>their words.</em></h2>
+          {hasPlace && typeof result.rating === "number" && <div className="rating-summary"><strong>{result.rating.toFixed(1)}</strong><div><span aria-label={`${result.rating} out of 5 stars`}>{"★".repeat(Math.round(result.rating))}{"☆".repeat(5 - Math.round(result.rating))}</span><p>{result.reviewCount ? `${result.reviewCount} Google reviews` : "Google reviews"}</p></div></div>}
+          {hasPlace && <div className="google-attribution"><img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" referrerPolicy="no-referrer" /><span>Maps</span><a href={result.googleMapsUri} target="_blank" rel="noreferrer">View Namo Decor on Google Maps ↗</a></div>}
         </aside>
         <div className="reviews-stage">
           {result.status === "ready" && <><ReviewsCarousel reviews={result.reviews} /><p className="reviews-disclosure">Reviews are supplied by Google Maps and shown in Google&apos;s default relevance order. Google does not verify reviews, but checks for and removes fake content when identified.</p></>}
@@ -35,7 +36,6 @@ export function ReviewsSection({ result }: { result: ReviewsResult }) {
           {result.status === "empty" && <ReviewNotice eyebrow="Google Reviews" title="There are no reviews available to display yet." copy="Namo Decor never substitutes fictional testimonials for live customer feedback." />}
         </div>
       </div>
-      <div className="reviews-exit"><div className="site-container"><span>Next / Project enquiries</span><p>Bring the next idea<br /><em>into focus.</em></p><span>Contact follows in the final phase</span></div></div>
     </section>
   );
 }
@@ -69,5 +69,5 @@ function ReviewNotice({ eyebrow, title, copy }: { eyebrow: string; title: string
 }
 
 export function ReviewsSkeleton() {
-  return <section id="reviews" className="reviews-section" aria-label="Loading Google reviews" aria-busy="true"><div className="site-container reviews-layout"><div className="reviews-skeleton reviews-skeleton--summary" /><div className="reviews-skeleton reviews-skeleton--stage" /></div></section>;
+  return <section id="reviews" className="reviews-section reviews-section--fallback" aria-label="Loading Google reviews" aria-busy="true"><div className="site-container reviews-layout"><div className="reviews-skeleton reviews-skeleton--summary" /><div className="reviews-skeleton reviews-skeleton--stage" /></div></section>;
 }
