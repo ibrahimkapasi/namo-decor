@@ -23,22 +23,29 @@ export function ProcessSection() {
         scrollTrigger: { trigger: section.current, start: "top 76%", once: true },
         defaults: { duration: 0.58, ease: "power3.out" },
       })
-        .from(".process-section__intro > *", { y: 16, opacity: 0, stagger: 0.06 })
-        .from(".process-line > li", { y: 14, opacity: 0, stagger: 0.07 }, "-=0.34");
+        .from(".process__head > *", { y: 16, opacity: 0, stagger: 0.06 })
+        .from(".process__line > li", { y: 14, opacity: 0, stagger: 0.07 }, "-=0.34");
     }, section);
 
     return () => context.revert();
   }, []);
 
   return (
-    <section ref={section} id="process" className="process-section section-shell" aria-labelledby="process-title">
+    <section ref={section} id="process" className="section section--paper process" aria-labelledby="process-title">
       <div className="site-container">
-        <header className="section-intro process-section__intro">
-          <p className="section-kicker">04 / Process</p>
-          <div><h2 id="process-title" className="section-title">One clear path from intent to presentation.</h2></div>
-          <p className="section-support">A compact working rhythm that keeps the original design direction visible throughout.</p>
+        <i className="section-rule" aria-hidden="true" />
+
+        <header className="section-head process__head">
+          <p className="kicker">04 — Process</p>
+          <h2 id="process-title" className="title section-head__title">
+            One clear path from intent to <em>presentation.</em>
+          </h2>
+          <p className="support section-head__support">
+            A compact working rhythm that keeps the original design direction visible throughout.
+          </p>
         </header>
-        <ol className="process-line">
+
+        <ol className="process__line">
           {steps.map((step) => (
             <li key={step.number}>
               <span>{step.number}</span>

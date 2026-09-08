@@ -84,7 +84,7 @@ export function SiteHeader() {
     <>
       <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
         <div className="site-container site-header__inner">
-          <Wordmark light={!scrolled} />
+          <Wordmark />
           <nav className="desktop-nav" aria-label="Primary navigation">
             {navigation.map((item) => <a className="nav-link" href={item.href} key={item.label}>{item.label}</a>)}
           </nav>
@@ -115,7 +115,7 @@ export function SiteHeader() {
       >
         <div className="site-container mobile-menu__inner">
           <div className="mobile-menu__header">
-            <Wordmark light onClick={closeMenu} />
+            <Wordmark onClick={closeMenu} />
             <button
               ref={closeButton}
               className="menu-trigger menu-trigger--light"

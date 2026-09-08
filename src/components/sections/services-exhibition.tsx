@@ -53,14 +53,14 @@ export function ServicesExhibition() {
   useEffect(() => {
     if (!section.current) return;
     const context = gsap.context(() => {
-      gsap.from(".services-exhibition-head > *", {
+      gsap.from(".services__head > *", {
         y: 18,
         opacity: 0,
         duration: 0.65,
         stagger: 0.08,
         ease: "power3.out",
         immediateRender: false,
-        scrollTrigger: { trigger: ".services-exhibition-head", start: "top 80%", once: true },
+        scrollTrigger: { trigger: ".services__head", start: "top 80%", once: true },
       });
       gsap.from(".service-index-row", {
         y: 16,
@@ -116,8 +116,8 @@ export function ServicesExhibition() {
       gsap.killTweensOf(targets);
 
       if (reduced) {
-        section.current?.querySelectorAll<HTMLElement>("[data-service-image]").forEach((image, index) => {
-          gsap.set(image, { opacity: index === active ? 1 : 0, scale: 1 });
+        section.current?.querySelectorAll<HTMLElement>("[data-service-image]").forEach((image, imageIndex) => {
+          gsap.set(image, { opacity: imageIndex === active ? 1 : 0, scale: 1 });
         });
         if (previewCopy.current) gsap.set(previewCopy.current, { opacity: 1, y: 0 });
       } else {
@@ -140,10 +140,10 @@ export function ServicesExhibition() {
     reveal();
   }, [active]);
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let next = index;
-    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % services.length;
-    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + services.length) % services.length;
+  const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, rowIndex: number) => {
+    let next = rowIndex;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (rowIndex + 1) % services.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (rowIndex - 1 + services.length) % services.length;
     else if (event.key === "Home") next = 0;
     else if (event.key === "End") next = services.length - 1;
     else return;
@@ -153,74 +153,90 @@ export function ServicesExhibition() {
   };
 
   return (
-    <section id="services" ref={section} className="services-exhibition" aria-labelledby="services-exhibition-title">
-      <div className="site-container services-exhibition-head">
-        <span>03 / Capabilities</span>
-        <h2 id="services-exhibition-title">Six ways to make<br /><em>design visible.</em></h2>
-        <p>Visual and design support built around the way architects, designers and builders develop and communicate spaces.</p>
-      </div>
+    <section id="services" ref={section} className="section section--night services" aria-labelledby="services-title">
+      <div className="site-container">
+        <i className="section-rule" aria-hidden="true" />
 
-      <div className="site-container services-exhibition-desktop">
-        <div ref={indexList} className="service-index" role="tablist" aria-label="Services" aria-orientation="vertical">
-          <span ref={indicator} className="service-index-indicator" aria-hidden="true" />
-          {services.map((service, index) => (
-            <button
-              ref={(element) => { rows.current[index] = element; }}
-              key={service.number}
-              id={`service-index-${index}`}
-              className={`service-index-row${active === index ? " is-active" : ""}`}
-              type="button"
-              role="tab"
-              aria-selected={active === index}
-              aria-controls="service-stage"
-              tabIndex={active === index ? 0 : -1}
-              onFocus={() => setActive(index)}
-              onClick={() => setActive(index)}
-              onKeyDown={(event) => onKeyDown(event, index)}
-            >
-              <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">↗</i>
-            </button>
-          ))}
-        </div>
-        <div id="service-stage" className={`service-preview${activeService.imageRole === "representative-outcome" ? " is-text-led" : ""}`} role="tabpanel" aria-labelledby={`service-index-${active}`}>
-          <div className="service-preview__layers">
-            {services.map((service, index) => service.imageRole !== "representative-outcome" && (
-              <Image
+        <header className="section-head services__head">
+          <p className="kicker">03 — Capabilities</p>
+          <h2 id="services-title" className="title section-head__title">
+            Six ways to make <em>design visible.</em>
+          </h2>
+          <p className="support section-head__support">
+            Visual and design support built around the way architects, designers and builders develop and communicate spaces.
+          </p>
+        </header>
+
+        <div className="services__body">
+          <div ref={indexList} className="service-index" role="tablist" aria-label="Services" aria-orientation="vertical">
+            <span ref={indicator} className="service-index-indicator" aria-hidden="true" />
+            {services.map((service, rowIndex) => (
+              <button
+                ref={(element) => { rows.current[rowIndex] = element; }}
                 key={service.number}
-                data-service-image={index}
-                style={{ opacity: index === 0 ? 1 : 0 }}
-                src={service.image}
-                alt={active === index ? service.imageAlt : ""}
-                fill
-                sizes="42vw"
-              />
+                id={`service-index-${rowIndex}`}
+                className={`service-index-row${active === rowIndex ? " is-active" : ""}`}
+                type="button"
+                role="tab"
+                aria-selected={active === rowIndex}
+                aria-controls="service-stage"
+                tabIndex={active === rowIndex ? 0 : -1}
+                onFocus={() => setActive(rowIndex)}
+                onClick={() => setActive(rowIndex)}
+                onKeyDown={(event) => onKeyDown(event, rowIndex)}
+              >
+                <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">↗</i>
+              </button>
             ))}
           </div>
-          <div ref={previewCopy} className="service-preview__copy">
-            <span>{activeService.number} / 06</span>
-            <h3>{activeService.title}</h3>
-            <p>{activeService.description}</p>
-            <small>{sourceNote(activeService)}</small>
+
+          <div
+            id="service-stage"
+            className={`service-preview${activeService.imageRole === "representative-outcome" ? " is-text-led" : ""}`}
+            role="tabpanel"
+            aria-labelledby={`service-index-${active}`}
+          >
+            <div className="service-preview__layers">
+              {services.map((service, layerIndex) => service.imageRole !== "representative-outcome" && (
+                <Image
+                  key={service.number}
+                  data-service-image={layerIndex}
+                  style={{ opacity: layerIndex === 0 ? 1 : 0 }}
+                  src={service.image}
+                  alt={active === layerIndex ? service.imageAlt : ""}
+                  fill
+                  sizes="42vw"
+                />
+              ))}
+            </div>
+            <div ref={previewCopy} className="service-preview__copy">
+              <span>{activeService.number} / 06</span>
+              <h3>{activeService.title}</h3>
+              <p>{activeService.description}</p>
+              <small>{sourceNote(activeService)}</small>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="site-container services-exhibition-mobile">
-        {services.map((service, index) => {
-          const open = mobileOpen === index;
-          return (
-            <article key={service.number} className={`service-accordion${open ? " is-open" : ""}`}>
-              <h3>
-                <button type="button" aria-expanded={open} aria-controls={`service-panel-${index}`} onClick={() => setMobileOpen(open ? null : index)}>
-                  <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">{open ? "−" : "+"}</i>
-                </button>
-              </h3>
-              <div id={`service-panel-${index}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={!open}>
-                <div className="service-accordion__panel"><ServicePreview service={service} mobile /></div>
-              </div>
-            </article>
-          );
-        })}
+        <div className="services__accordion">
+          {services.map((service, panelIndex) => {
+            const open = mobileOpen === panelIndex;
+            return (
+              <article key={service.number} className={`service-accordion${open ? " is-open" : ""}`}>
+                <h3>
+                  <button type="button" aria-expanded={open} aria-controls={`service-panel-${panelIndex}`} onClick={() => setMobileOpen(open ? null : panelIndex)}>
+                    <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">{open ? "−" : "+"}</i>
+                  </button>
+                </h3>
+                <div id={`service-panel-${panelIndex}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={!open}>
+                  <div className="service-accordion__panel">
+                    <div><ServicePreview service={service} mobile /></div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

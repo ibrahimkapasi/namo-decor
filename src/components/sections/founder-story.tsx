@@ -19,30 +19,60 @@ const founderPortrait = imageById("founderPortrait");
 
 export function FounderStory() {
   const section = useRef<HTMLElement>(null);
+
   useEffect(() => {
     if (!section.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const context = gsap.context(() => {
       gsap.timeline({ scrollTrigger: { trigger: section.current, start: "top 74%", once: true }, defaults: { ease: "power3.out" } })
-        .from(".founder-portrait", { clipPath: "inset(5% 0 5% 0)", opacity: 0, duration: 0.68 })
-        .from(".founder-identity > *", { y: 18, opacity: 0, stagger: 0.06, duration: 0.58 }, "-=0.42")
-        .from(".founder-beat", { y: 14, opacity: 0, stagger: 0.06, duration: 0.56 }, "-=0.32");
+        .from(".founder__portrait", { clipPath: "inset(5% 0 5% 0)", opacity: 0, duration: 0.68 })
+        .from(".founder__lede", { y: 18, opacity: 0, duration: 0.58 }, "-=0.42")
+        .from(".founder__beat", { y: 14, opacity: 0, stagger: 0.06, duration: 0.56 }, "-=0.32");
     }, section);
     return () => context.revert();
   }, []);
 
   return (
-    <section id="founder" ref={section} className="founder-story" aria-labelledby="founder-title">
-      <div className="site-container founder-heading"><span>05 / Behind Namo Decor</span><p>Founder profile</p></div>
-      <div className="site-container founder-composition">
-        <figure className="founder-portrait">
-          <Image src={founderPortrait.src} alt={founderPortrait.alt} fill sizes="(max-width: 767px) 100vw, (max-width: 1199px) 44vw, 36vw" quality={90} />
-          <figcaption>Founder / Namo Decor</figcaption>
-        </figure>
-        <div className="founder-identity">
-          <span>Founder · Namo Decor</span>
-          <h2 id="founder-title">Naitri <em>Mehta.</em></h2>
-          <p className="founder-lede">Driven by a passion for design and visual storytelling, {founder.name} built Namo Decor to make ambitious ideas visible and convincing.</p>
-          <div className="founder-beats">{story.map((beat) => <article className="founder-beat" key={beat.number}><span>{beat.number}</span><div><h3>{beat.title}</h3><p>{beat.copy}</p></div></article>)}</div>
+    <section id="founder" ref={section} className="section section--raised founder" aria-labelledby="founder-title">
+      <div className="site-container">
+        <i className="section-rule" aria-hidden="true" />
+
+        <header className="section-head founder__head">
+          <p className="kicker">05 — Behind Namo Decor</p>
+          <h2 id="founder-title" className="title section-head__title">
+            Naitri <em>Mehta.</em>
+          </h2>
+          <p className="support section-head__support">{founder.purpose}.</p>
+        </header>
+
+        <div className="founder__composition">
+          <figure className="founder__portrait">
+            <Image
+              src={founderPortrait.src}
+              alt={founderPortrait.alt}
+              fill
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 44vw, 36vw"
+              quality={90}
+            />
+            <figcaption>Founder / Namo Decor</figcaption>
+          </figure>
+
+          <div className="founder__identity">
+            <p className="founder__lede">
+              Driven by a passion for design and visual storytelling, {founder.name} built Namo Decor to make ambitious
+              ideas visible and convincing.
+            </p>
+            <div className="founder__beats">
+              {story.map((beat) => (
+                <article className="founder__beat" key={beat.number}>
+                  <span>{beat.number}</span>
+                  <div>
+                    <h3>{beat.title}</h3>
+                    <p>{beat.copy}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

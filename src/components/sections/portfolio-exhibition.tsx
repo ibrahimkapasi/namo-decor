@@ -48,6 +48,8 @@ const archiveItems = portfolioItems.filter((item) => !featuredIds.has(item.id));
 const categoryLabel = (category: PortfolioCategory) =>
   portfolioCategories.find((item) => item.id === category)?.label ?? category;
 
+const index = (value: number) => String(value).padStart(2, "0");
+
 const imageVariables = (item: PortfolioItem): ImageVariables => ({
   "--asset-position": item.crop.desktop.objectPosition,
   "--asset-mobile-position": item.crop.mobile.objectPosition,
@@ -56,10 +58,12 @@ const imageVariables = (item: PortfolioItem): ImageVariables => ({
 
 function WorkCard({
   item,
+  position,
   variant,
   onOpen,
 }: {
   item: PortfolioItem;
+  position: number;
   variant: "lead" | "paired" | "closing";
   onOpen: (item: PortfolioItem, trigger: HTMLElement) => void;
 }) {
@@ -68,14 +72,22 @@ function WorkCard({
       <button type="button" className="portfolio-feature-card__image" onClick={(event) => onOpen(item, event.currentTarget)}>
         <span className="portfolio-feature-card__media">
           <span className="portfolio-feature-card__entrance">
-            <Image src={item.image} alt={item.alt} fill sizes={variant === "paired" ? "(max-width: 767px) 100vw, 45vw" : "(max-width: 767px) 100vw, 82vw"} />
+            <Image
+              src={item.image}
+              alt={item.alt}
+              fill
+              sizes={variant === "paired" ? "(max-width: 767px) 100vw, 45vw" : "(max-width: 767px) 100vw, 82vw"}
+            />
           </span>
         </span>
         <span className="portfolio-feature-card__view">View image <i aria-hidden="true">↗</i></span>
       </button>
       <div className="portfolio-feature-card__caption">
-        <p>{categoryLabel(item.category)}</p>
-        <h3>{item.title}</h3>
+        <span className="portfolio-feature-card__index">{index(position)}</span>
+        <div>
+          <p>{categoryLabel(item.category)}</p>
+          <h3>{item.title}</h3>
+        </div>
         <span>{item.descriptor}</span>
       </div>
     </article>
@@ -83,7 +95,7 @@ function WorkCard({
 }
 
 function PortfolioViewer({
-  index,
+  index: activeIndex,
   onClose,
   onChange,
 }: {
@@ -96,7 +108,7 @@ function PortfolioViewer({
   const imageFrame = useRef<HTMLDivElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const closing = useRef(false);
-  const item = portfolioItems[index];
+  const item = portfolioItems[activeIndex];
 
   const requestClose = useCallback(() => {
     if (closing.current) return;
@@ -142,13 +154,13 @@ function PortfolioViewer({
     if (!imageFrame.current || closing.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.killTweensOf(imageFrame.current);
     gsap.fromTo(imageFrame.current, { opacity: 0.72, scale: 0.995 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", overwrite: true });
-  }, [index]);
+  }, [activeIndex]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") requestClose();
-      else if (event.key === "ArrowRight") onChange((index + 1) % portfolioItems.length);
-      else if (event.key === "ArrowLeft") onChange((index - 1 + portfolioItems.length) % portfolioItems.length);
+      else if (event.key === "ArrowRight") onChange((activeIndex + 1) % portfolioItems.length);
+      else if (event.key === "ArrowLeft") onChange((activeIndex - 1 + portfolioItems.length) % portfolioItems.length);
       else if (event.key === "Tab" && dialog.current) {
         const focusable = Array.from(dialog.current.querySelectorAll<HTMLElement>("button:not([disabled]), [href], [tabindex='0']"));
         const first = focusable[0];
@@ -164,10 +176,8 @@ function PortfolioViewer({
     };
 
     window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [index, onChange, requestClose]);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [activeIndex, onChange, requestClose]);
 
   return createPortal(
     <div ref={overlay} className="portfolio-viewer" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose(); }}>
@@ -181,10 +191,10 @@ function PortfolioViewer({
         </div>
         <div className="portfolio-viewer__footer">
           <p>{item.descriptor}</p>
-          <span>{String(index + 1).padStart(2, "0")} / {String(portfolioItems.length).padStart(2, "0")}</span>
+          <span>{index(activeIndex + 1)} / {index(portfolioItems.length)}</span>
           <div>
-            <button type="button" onClick={() => onChange((index - 1 + portfolioItems.length) % portfolioItems.length)} aria-label="Previous image">←</button>
-            <button type="button" onClick={() => onChange((index + 1) % portfolioItems.length)} aria-label="Next image">→</button>
+            <button className="icon-button" type="button" onClick={() => onChange((activeIndex - 1 + portfolioItems.length) % portfolioItems.length)} aria-label="Previous image">←</button>
+            <button className="icon-button" type="button" onClick={() => onChange((activeIndex + 1) % portfolioItems.length)} aria-label="Next image">→</button>
           </div>
         </div>
       </div>
@@ -237,18 +247,18 @@ export function PortfolioExhibition() {
       media.add(
         {
           motion: "(prefers-reduced-motion: no-preference)",
-          depth: "(prefers-reduced-motion: no-preference) and (pointer: fine) and (min-width: 900px)",
+          depth: "(prefers-reduced-motion: no-preference) and (pointer: fine) and (min-width: 1024px)",
         },
         ({ conditions }) => {
           if (!conditions?.motion) return;
 
           gsap.timeline({
-            scrollTrigger: { trigger: ".portfolio-intro", start: "top 80%", once: true },
+            scrollTrigger: { trigger: ".portfolio__head", start: "top 80%", once: true },
             defaults: { ease: "power3.out" },
           })
-            .from(".portfolio-intro > span", { y: 12, opacity: 0, duration: 0.52 })
-            .from(".portfolio-intro h2", { y: 24, opacity: 0, duration: 0.72 }, "-=0.32")
-            .from(".portfolio-intro > p", { y: 14, opacity: 0, duration: 0.58 }, "-=0.42");
+            .from(".portfolio__head .kicker", { y: 12, opacity: 0, duration: 0.52 })
+            .from(".portfolio__head .title", { y: 24, opacity: 0, duration: 0.72 }, "-=0.32")
+            .from(".portfolio__head .support", { y: 14, opacity: 0, duration: 0.58 }, "-=0.42");
 
           gsap.timeline({
             scrollTrigger: { trigger: ".portfolio-feature-card--lead", start: "top 82%", once: true },
@@ -403,80 +413,106 @@ export function PortfolioExhibition() {
   const nightItem = portfolioItems.find((item) => item.id === "high-rise-exterior-night")!;
 
   return (
-    <section id="projects" ref={section} className="portfolio-exhibition" aria-labelledby="portfolio-title">
-      <div className="site-container portfolio-intro">
-        <span>02 / Selected work</span>
-        <h2 id="portfolio-title">A concise edit of<br /><em>spaces made visible.</em></h2>
-        <p>Five compositions spanning residential, hospitality, exterior and lobby visualization.</p>
-      </div>
+    <section id="projects" ref={section} className="section section--night portfolio" aria-labelledby="portfolio-title">
+      <div className="site-container">
+        <i className="section-rule" aria-hidden="true" />
 
-      <div className="site-container portfolio-feature-grid">
-        <WorkCard item={featuredItems[0]} variant="lead" onOpen={openViewer} />
-        <div className="portfolio-feature-pair">
-          <WorkCard item={featuredItems[1]} variant="paired" onOpen={openViewer} />
-          <WorkCard item={featuredItems[2]} variant="paired" onOpen={openViewer} />
+        <header className="section-head portfolio__head">
+          <p className="kicker">02 — Selected work</p>
+          <h2 id="portfolio-title" className="title section-head__title">
+            A concise edit of <em>spaces made visible.</em>
+          </h2>
+          <p className="support section-head__support">
+            Five compositions spanning residential, hospitality, exterior and lobby visualization.
+          </p>
+        </header>
+
+        <div className="portfolio-feature-grid">
+          <WorkCard item={featuredItems[0]} position={1} variant="lead" onOpen={openViewer} />
+          <div className="portfolio-feature-pair">
+            <WorkCard item={featuredItems[1]} position={2} variant="paired" onOpen={openViewer} />
+            <WorkCard item={featuredItems[2]} position={3} variant="paired" onOpen={openViewer} />
+          </div>
+
+          <article className="portfolio-feature-card portfolio-feature-card--exterior">
+            <div className="portfolio-comparison">
+              <Image src={nightItem.image} alt={nightItem.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+              <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}>
+                <Image src={dayItem.image} alt={dayItem.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+              </div>
+              <span className="portfolio-comparison__label portfolio-comparison__label--day">Day</span>
+              <span className="portfolio-comparison__label portfolio-comparison__label--night">Night</span>
+              <span className="portfolio-comparison__line" style={{ left: `${compare}%` }} aria-hidden="true" />
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={compare}
+                onPointerDown={() => compareTween.current?.kill()}
+                onChange={(event) => setComparison(Number(event.target.value))}
+                aria-label="Compare day and night views of the same exterior"
+                aria-valuetext={`${Math.round(compare)}% day, ${Math.round(100 - compare)}% night`}
+              />
+            </div>
+            <div className="portfolio-comparison__caption">
+              <div>
+                <p>{categoryLabel(dayItem.category)}</p>
+                <h3>High-Rise Exterior — Day / Night</h3>
+                <span>One exterior composition shown across two lighting conditions.</span>
+              </div>
+              <div className="portfolio-comparison__controls" aria-label="Comparison controls">
+                <button type="button" aria-pressed={compare === 100} onClick={() => animateComparison(100)}>Show day</button>
+                <button type="button" aria-pressed={compare === 0} onClick={() => animateComparison(0)}>Show night</button>
+                <button type="button" onClick={(event) => openViewer(compare >= 50 ? dayItem : nightItem, event.currentTarget)}>Open full view</button>
+              </div>
+            </div>
+          </article>
+
+          <WorkCard item={featuredItems[4]} position={5} variant="closing" onOpen={openViewer} />
         </div>
 
-        <article className="portfolio-feature-card portfolio-feature-card--exterior">
-          <div className="portfolio-comparison">
-            <Image src={nightItem.image} alt={nightItem.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
-            <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}>
-              <Image src={dayItem.image} alt={dayItem.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
-            </div>
-            <span className="portfolio-comparison__label portfolio-comparison__label--day">Day</span>
-            <span className="portfolio-comparison__label portfolio-comparison__label--night">Night</span>
-            <span className="portfolio-comparison__line" style={{ left: `${compare}%` }} aria-hidden="true" />
-            <input type="range" min="0" max="100" value={compare} onPointerDown={() => compareTween.current?.kill()} onChange={(event) => setComparison(Number(event.target.value))} aria-label="Compare day and night views of the same exterior" aria-valuetext={`${Math.round(compare)}% day, ${Math.round(100 - compare)}% night`} />
+        <div className="portfolio-archive-entry">
+          <div>
+            <span className="meta-label">Wider archive</span>
+            <p>{archiveItems.length} additional visual studies spanning residential, hospitality, exterior and lobby work.</p>
           </div>
-          <div className="portfolio-comparison__caption">
-            <div><p>{categoryLabel(dayItem.category)}</p><h3>High-Rise Exterior — Day / Night</h3><span>One exterior composition shown across two lighting conditions.</span></div>
-            <div className="portfolio-comparison__controls" aria-label="Comparison controls">
-              <button type="button" aria-pressed={compare === 100} onClick={() => animateComparison(100)}>Show day</button>
-              <button type="button" aria-pressed={compare === 0} onClick={() => animateComparison(0)}>Show night</button>
-              <button type="button" onClick={(event) => openViewer(compare >= 50 ? dayItem : nightItem, event.currentTarget)}>Open full view</button>
-            </div>
-          </div>
-        </article>
-
-        <WorkCard item={featuredItems[4]} variant="closing" onOpen={openViewer} />
-      </div>
-
-      <div className="site-container portfolio-archive-entry">
-        <div><span>Wider archive</span><p>{archiveItems.length} additional visual studies spanning residential, hospitality, exterior and lobby work.</p></div>
-        <button type="button" onClick={toggleArchive} aria-expanded={expanded} aria-controls="portfolio-archive">
-          {expanded ? "Close archive" : "View all visuals"}<span aria-hidden="true">{expanded ? "−" : "+"}</span>
-        </button>
-      </div>
-
-      {archiveMounted && (
-        <div ref={archive} id="portfolio-archive" className={`portfolio-archive${expanded ? " is-expanded" : ""}`} aria-hidden={!expanded} inert={!expanded}>
-          <div className="site-container portfolio-categories" role="toolbar" aria-label="Filter wider archive">
-            {categories.map((item) => {
-              const count = item.id === "all" ? archiveItems.length : archiveItems.filter((work) => work.category === item.id).length;
-              return (
-                <button key={item.id} type="button" className={category === item.id ? "is-active" : ""} aria-pressed={category === item.id} onClick={() => selectCategory(item.id)}>
-                  {item.label}<span>{count}</span>
-                </button>
-              );
-            })}
-          </div>
-          <div ref={archiveGrid} className="site-container portfolio-archive-grid">
-            {renderedArchive.map((item) => (
-              <article key={item.id} className="portfolio-archive-card" style={imageVariables(item)}>
-                <button type="button" className="portfolio-archive-card__image" onClick={(event) => openViewer(item, event.currentTarget)} aria-label={`Open ${item.title}`}>
-                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw" />
-                </button>
-                <div><p>{categoryLabel(item.category)}</p><h3>{item.title}</h3></div>
-              </article>
-            ))}
-          </div>
+          <button className="ghost-button" type="button" onClick={toggleArchive} aria-expanded={expanded} aria-controls="portfolio-archive">
+            {expanded ? "Close archive" : "View all visuals"}<span aria-hidden="true">{expanded ? "−" : "+"}</span>
+          </button>
         </div>
-      )}
+
+        {archiveMounted && (
+          <div ref={archive} id="portfolio-archive" className="portfolio-archive" aria-hidden={!expanded} inert={!expanded}>
+            <div className="portfolio-categories" role="toolbar" aria-label="Filter wider archive">
+              {categories.map((item) => {
+                const count = item.id === "all" ? archiveItems.length : archiveItems.filter((work) => work.category === item.id).length;
+                return (
+                  <button key={item.id} type="button" className={category === item.id ? "is-active" : ""} aria-pressed={category === item.id} onClick={() => selectCategory(item.id)}>
+                    {item.label}<span>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div ref={archiveGrid} className="portfolio-archive-grid">
+              {renderedArchive.map((item) => (
+                <article key={item.id} className="portfolio-archive-card" style={imageVariables(item)}>
+                  <button type="button" className="portfolio-archive-card__image" onClick={(event) => openViewer(item, event.currentTarget)} aria-label={`Open ${item.title}`}>
+                    <Image src={item.image} alt={item.alt} fill sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" />
+                  </button>
+                  <div><p>{categoryLabel(item.category)}</p><h3>{item.title}</h3></div>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="portfolio-exit">
         <div className="site-container portfolio-exit__inner">
           <i className="portfolio-exit__rule" aria-hidden="true" />
-          <span>Next / Capabilities</span><p>From image to <em>support.</em></p><span>Six ways to make design visible</span>
+          <span>Next / Capabilities</span>
+          <p>From image to <em>support.</em></p>
+          <span>Six ways to make design visible</span>
         </div>
       </div>
 
