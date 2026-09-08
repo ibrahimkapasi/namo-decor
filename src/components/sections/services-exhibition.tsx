@@ -215,7 +215,7 @@ export function ServicesExhibition() {
                   <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">{open ? "−" : "+"}</i>
                 </button>
               </h3>
-              <div id={`service-panel-${index}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={open ? undefined : ""}>
+              <div id={`service-panel-${index}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={!open}>
                 <div className="service-accordion__panel"><ServicePreview service={service} mobile /></div>
               </div>
             </article>

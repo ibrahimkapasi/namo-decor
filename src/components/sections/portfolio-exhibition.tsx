@@ -209,7 +209,7 @@ export function PortfolioExhibition() {
 
   useEffect(() => setMounted(true), []);
 
-  useEffect(() => () => compareTween.current?.kill(), []);
+  useEffect(() => () => { compareTween.current?.kill(); }, []);
 
   useEffect(() => {
     if (!archiveMounted || !archive.current) return;

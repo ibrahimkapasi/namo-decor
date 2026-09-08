@@ -24,4 +24,5 @@ export const founder = {
 
 export const heroImages = {
   primary: imageById("hospitalityBarHero"),
+  detail: imageById("towerNightPortrait"),
 };
