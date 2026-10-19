@@ -5,14 +5,18 @@ export function ArrowLink({
   children,
   variant = "solid",
   onClick,
+  target,
+  rel,
 }: {
   href: string;
   children: ReactNode;
   variant?: "solid" | "line";
   onClick?: () => void;
+  target?: string;
+  rel?: string;
 }) {
   return (
-    <a className={`arrow-link arrow-link--${variant}`} href={href} onClick={onClick}>
+    <a className={`arrow-link arrow-link--${variant}`} href={href} onClick={onClick} target={target} rel={rel}>
       <span className="arrow-link__text">{children}</span>
       <span className="arrow-link__icon" aria-hidden="true">
         <svg viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M7 5h8v8" /></svg>

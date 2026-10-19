@@ -19,9 +19,9 @@ export default function Home() {
       <main>
         <HeroExhibition />
         <StudioStory />
-        <PortfolioExhibition />
         <ServicesExhibition />
         <ProcessSection />
+        <PortfolioExhibition />
         <FounderStory />
         <Suspense fallback={<ReviewsSkeleton />}><ReviewsServer /></Suspense>
         <ContactSection />

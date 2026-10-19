@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { navigation } from "@/data/site";
 import { Wordmark } from "@/components/ui/wordmark";
-import { ArrowLink } from "@/components/ui/arrow-link";
+import { contactLinks } from "@/data/contact";
+import { ContactIcon } from "@/components/contact/contact-icons";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -84,11 +85,11 @@ export function SiteHeader() {
     <>
       <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
         <div className="site-container site-header__inner">
-          <Wordmark light={!scrolled} />
+          <Wordmark />
           <nav className="desktop-nav" aria-label="Primary navigation">
             {navigation.map((item) => <a className="nav-link" href={item.href} key={item.label}>{item.label}</a>)}
           </nav>
-          <div className="desktop-cta"><ArrowLink href="#contact">Start a Project</ArrowLink></div>
+          <a className="whatsapp-cta desktop-cta" href={contactLinks.whatsapp} target="_blank" rel="noreferrer" aria-label="Chat with Namo Decor on WhatsApp"><ContactIcon name="whatsapp" /><span>Chat on WhatsApp</span></a>
           <button
             ref={openButton}
             className="menu-trigger"
@@ -115,7 +116,7 @@ export function SiteHeader() {
       >
         <div className="site-container mobile-menu__inner">
           <div className="mobile-menu__header">
-            <Wordmark light onClick={closeMenu} />
+            <Wordmark onClick={closeMenu} />
             <button
               ref={closeButton}
               className="menu-trigger menu-trigger--light"
@@ -131,13 +132,13 @@ export function SiteHeader() {
           <nav className="mobile-nav" aria-label="Mobile navigation">
             {navigation.map((item, index) => (
               <a className="mobile-nav-link" href={item.href} key={item.label} onClick={closeMenu} tabIndex={menuOpen ? 0 : -1}>
-                <span>0{index + 1}</span>{item.label}
+                {item.label}
               </a>
             ))}
           </nav>
           <div className="mobile-menu__footer">
             <p>3D visualization and end-to-end design support for the people shaping spaces.</p>
-            <ArrowLink href="#contact" variant="line" onClick={closeMenu}>Start a Project</ArrowLink>
+            <a className="whatsapp-cta" href={contactLinks.whatsapp} target="_blank" rel="noreferrer" onClick={closeMenu} tabIndex={menuOpen ? 0 : -1}><ContactIcon name="whatsapp" /><span>Chat on WhatsApp</span></a>
           </div>
         </div>
       </div>

@@ -8,16 +8,6 @@ import { services, type Service } from "@/data/services";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const sourceNote = (service: Service) => {
-  if (service.imageRole === "spatial-reference") {
-    return "A static visualization illustrating spatial sequence and movement.";
-  }
-  if (service.imageRole === "representative-outcome") {
-    return "This capability is presented through its process and intended outcome.";
-  }
-  return "A visualization example from the Namo Decor portfolio.";
-};
-
 function ServicePreview({ service, mobile = false }: { service: Service; mobile?: boolean }) {
   const textOnly = service.imageRole === "representative-outcome";
 
@@ -29,10 +19,8 @@ function ServicePreview({ service, mobile = false }: { service: Service; mobile?
         </div>
       )}
       <div className="service-preview-content__copy">
-        <span>{service.number} / 06</span>
         <h3>{service.title}</h3>
         <p>{service.description}</p>
-        <small>{sourceNote(service)}</small>
       </div>
     </div>
   );
@@ -155,9 +143,7 @@ export function ServicesExhibition() {
   return (
     <section id="services" ref={section} className="services-exhibition" aria-labelledby="services-exhibition-title">
       <div className="site-container services-exhibition-head">
-        <span>03 / Capabilities</span>
         <h2 id="services-exhibition-title">Six ways to make<br /><em>design visible.</em></h2>
-        <p>Visual and design support built around the way architects, designers and builders develop and communicate spaces.</p>
       </div>
 
       <div className="site-container services-exhibition-desktop">
@@ -197,10 +183,8 @@ export function ServicesExhibition() {
             ))}
           </div>
           <div ref={previewCopy} className="service-preview__copy">
-            <span>{activeService.number} / 06</span>
             <h3>{activeService.title}</h3>
             <p>{activeService.description}</p>
-            <small>{sourceNote(activeService)}</small>
           </div>
         </div>
       </div>
@@ -215,7 +199,7 @@ export function ServicesExhibition() {
                   <span>{service.number}</span><strong>{service.title}</strong><i aria-hidden="true">{open ? "−" : "+"}</i>
                 </button>
               </h3>
-              <div id={`service-panel-${index}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={open ? undefined : ""}>
+              <div id={`service-panel-${index}`} className="service-accordion__panel-shell" aria-hidden={!open} inert={!open}>
                 <div className="service-accordion__panel"><ServicePreview service={service} mobile /></div>
               </div>
             </article>

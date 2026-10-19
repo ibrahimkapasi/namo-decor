@@ -32,16 +32,15 @@ export function FounderStory() {
 
   return (
     <section id="founder" ref={section} className="founder-story" aria-labelledby="founder-title">
-      <div className="site-container founder-heading"><span>05 / Behind Namo Decor</span><p>Founder profile</p></div>
+      <header className="site-container founder-top">
+        <h2 id="founder-title" className="founder-heading-fancy">About the <em>Founder</em></h2>
+      </header>
       <div className="site-container founder-composition">
         <figure className="founder-portrait">
           <Image src={founderPortrait.src} alt={founderPortrait.alt} fill sizes="(max-width: 767px) 100vw, (max-width: 1199px) 44vw, 36vw" quality={90} />
-          <figcaption>Founder / Namo Decor</figcaption>
         </figure>
         <div className="founder-identity">
-          <span>Founder · Namo Decor</span>
-          <h2 id="founder-title">Naitri <em>Mehta.</em></h2>
-          <p className="founder-lede">Driven by a passion for design and visual storytelling, {founder.name} built Namo Decor to make ambitious ideas visible and convincing.</p>
+          <p className="founder-about">Driven by a passion for design and visual storytelling, <strong className="founder-highlight">{founder.name} built Namo Decor</strong> to make ambitious ideas visible and convincing.</p>
           <div className="founder-beats">{story.map((beat) => <article className="founder-beat" key={beat.number}><span>{beat.number}</span><div><h3>{beat.title}</h3><p>{beat.copy}</p></div></article>)}</div>
         </div>
       </div>

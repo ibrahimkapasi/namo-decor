@@ -10,6 +10,14 @@ import { refreshAfterLayoutSettles } from "@/lib/scroll-trigger-refresh";
 
 gsap.registerPlugin(ScrollTrigger);
 
+
+const heroStats = [
+  { value: "7+", label: "Years in the industry" },
+  { value: "6", label: "Design services" },
+  { value: "70+", label: "Visuals in portfolio" },
+  { value: "Pan-India", label: "Project partner" },
+];
+
 export function HeroExhibition() {
   const hero = useRef<HTMLElement>(null);
 
@@ -29,11 +37,10 @@ export function HeroExhibition() {
 
           gsap.timeline({ defaults: { ease: "power3.out" } })
             .from(".hero-primary-entrance", { scale: 1.05, duration: 1.1 }, 0)
-            .from(".hero-kicker-rule", { scaleX: 0, duration: 0.78, ease: "power2.inOut" }, 0.04)
             .from(".hero-title-line > span", { yPercent: 108, duration: 0.72, stagger: 0.09 }, 0.12)
             .from(".hero-exhibition-support", { y: 16, opacity: 0, duration: 0.62 }, 0.32)
             .from(".hero-exhibition-actions", { y: 13, opacity: 0, duration: 0.55 }, 0.45)
-            .from(".hero-exhibition-caption", { y: 10, opacity: 0, duration: 0.45 }, 0.55);
+            .from(".hero-stats > div", { y: 14, opacity: 0, duration: 0.5, stagger: 0.07 }, 0.6);
 
           if (conditions.depth) {
             gsap.fromTo(
@@ -85,16 +92,11 @@ export function HeroExhibition() {
       </div>
 
       <div className="site-container hero-exhibition-layout">
-        <p className="hero-exhibition-kicker">
-          <i className="hero-kicker-rule" aria-hidden="true" />
-          <span>3D visualization studio</span>
-          <span>{company.location}</span>
-        </p>
-
         <div className="hero-exhibition-copy">
+          <p className="hero-exhibition-kicker">{company.location}</p>
           <h1 id="hero-title" className="hero-exhibition-title">
             <span className="hero-title-line"><span>Ideas,</span></span>
-            <span className="hero-title-line"><span>made visible.</span></span>
+            <span className="hero-title-line"><span>made <em>visible.</em></span></span>
           </h1>
           <p className="hero-exhibition-support">
             Namo Decor creates 3D visualizations and design support for architects, interior designers and builders.
@@ -105,7 +107,11 @@ export function HeroExhibition() {
           </div>
         </div>
 
-        <p className="hero-exhibition-caption">Hospitality interior / 3D visualization</p>
+        <dl className="hero-stats">
+          {heroStats.map((stat) => (
+            <div key={stat.label}><dt>{stat.value}</dt><dd>{stat.label}</dd></div>
+          ))}
+        </dl>
       </div>
     </section>
   );

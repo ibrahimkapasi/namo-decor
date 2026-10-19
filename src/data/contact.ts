@@ -1,6 +1,6 @@
 export const contact = {
-  phone: "",
-  whatsapp: "",
+  phone: "+919082281625",
+  whatsapp: "+919082281625",
   email: "",
   socials: {
     instagram: "",

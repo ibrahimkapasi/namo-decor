@@ -25,7 +25,7 @@ export function ReviewsSection({ result }: { result: ReviewsResult }) {
     <section id="reviews" ref={section} className={`reviews-section${hasReviews ? "" : " reviews-section--fallback"}`} aria-labelledby="reviews-title">
       <div className="site-container reviews-layout">
         <aside className="reviews-summary">
-          <span>06 / Shared experiences</span><h2 id="reviews-title">Trust, in<br /><em>their words.</em></h2>
+          <h2 id="reviews-title">Trust, in<br /><em>their words.</em></h2>
           {hasPlace && typeof result.rating === "number" && <div className="rating-summary"><strong>{result.rating.toFixed(1)}</strong><div><span aria-label={`${result.rating} out of 5 stars`}>{"★".repeat(Math.round(result.rating))}{"☆".repeat(5 - Math.round(result.rating))}</span><p>{result.reviewCount ? `${result.reviewCount} Google reviews` : "Google reviews"}</p></div></div>}
           {hasPlace && <div className="google-attribution"><img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" referrerPolicy="no-referrer" /><span>Maps</span><a href={result.googleMapsUri} target="_blank" rel="noreferrer">View Namo Decor on Google Maps ↗</a></div>}
         </aside>

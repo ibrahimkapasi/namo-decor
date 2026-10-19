@@ -10,6 +10,11 @@ import { refreshAfterLayoutSettles } from "@/lib/scroll-trigger-refresh";
 gsap.registerPlugin(ScrollTrigger);
 
 const studioImage = imageById("warmLivingRoom");
+const studioSide = [
+  { tag: "Commercial", image: imageById("directorCabin") },
+  { tag: "Hospitality", image: imageById("barLounge") },
+];
+const audience = ["Architects", "Interior designers", "Builders", "Developers", "Design studios"];
 
 export function StudioStory() {
   const section = useRef<HTMLElement>(null);
@@ -45,8 +50,7 @@ export function StudioStory() {
             defaults: { ease: "power3.out" },
           })
             .from(".studio-positioning__visual-mask", { clipPath: "inset(5% 5% 5% 5%)", duration: 1.05, ease: "power2.inOut" })
-            .from(".studio-positioning__visual-entrance", { scale: 1.045, duration: 1.05 }, 0)
-            .from(".studio-positioning__visual figcaption", { y: 10, opacity: 0, duration: 0.5 }, "-=0.35");
+            .from(".studio-positioning__visual-entrance", { scale: 1.045, duration: 1.05 }, 0);
 
           if (conditions.desktop) {
             gsap.fromTo(
@@ -80,22 +84,26 @@ export function StudioStory() {
   return (
     <section id="about" ref={section} className="studio-positioning section-shell" aria-labelledby="studio-positioning-title">
       <div className="site-container">
-        <header className="studio-positioning__intro">
-          <p className="section-kicker">01 / The studio</p>
+        <header className="studio-positioning__intro studio-positioning__intro--v2">
           <h2 id="studio-positioning-title">
             <span className="studio-line-mask"><span className="studio-line-inner">Namo Decor is your</span></span>{" "}
             <span className="studio-line-mask"><span className="studio-line-inner">behind-the-scenes partner</span></span>{" "}
             <span className="studio-line-mask"><span className="studio-line-inner">in creating <em>stunning spaces.</em></span></span>
           </h2>
           <div className="studio-positioning__copy">
+            <p className="studio-quote">Your vision, rendered before it&rsquo;s built.</p>
             <p>
               We work alongside architects, interior designers and builders, translating design intent into clear,
               convincing 3D visuals before a space exists.
             </p>
-            <a href="#projects">View selected work <span aria-hidden="true">↘</span></a>
+            <ul className="studio-audience" aria-label="Who we work with">
+              {audience.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+            <a href="#services">See what we offer <span aria-hidden="true">↘</span></a>
           </div>
         </header>
 
+        <div className="studio-mosaic">
         <figure className="studio-positioning__visual">
           <div className="studio-positioning__visual-mask">
             <div className="studio-positioning__visual-depth">
@@ -109,8 +117,17 @@ export function StudioStory() {
               </div>
             </div>
           </div>
-          <figcaption>Residential interior visualization / light, material and proportion</figcaption>
+          <span className="image-tag">Residential</span>
         </figure>
+        <div className="studio-mosaic__side">
+          {studioSide.map((item) => (
+            <figure key={item.tag}>
+              <Image src={item.image.src} alt={item.image.alt} fill sizes="(max-width: 767px) 50vw, 26vw" />
+              <span className="image-tag">{item.tag}</span>
+            </figure>
+          ))}
+        </div>
+        </div>
       </div>
     </section>
   );

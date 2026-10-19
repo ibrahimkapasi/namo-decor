@@ -34,9 +34,7 @@ export function ProcessSection() {
     <section ref={section} id="process" className="process-section section-shell" aria-labelledby="process-title">
       <div className="site-container">
         <header className="section-intro process-section__intro">
-          <p className="section-kicker">04 / Process</p>
           <div><h2 id="process-title" className="section-title">One clear path from intent to presentation.</h2></div>
-          <p className="section-support">A compact working rhythm that keeps the original design direction visible throughout.</p>
         </header>
         <ol className="process-line">
           {steps.map((step) => (

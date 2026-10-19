@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,6 +11,7 @@ import {
   type PortfolioCategory,
   type PortfolioItem,
 } from "@/data/portfolio";
+import { imageById } from "@/data/image-manifest";
 import { refreshAfterLayoutSettles } from "@/lib/scroll-trigger-refresh";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -27,23 +28,65 @@ const categories: ReadonlyArray<{ id: CategoryFilter; label: string }> = [
   ...portfolioCategories,
 ];
 
-const featuredIds = new Set([
+const byId = (id: string) => portfolioItems.find((item) => item.id === id)!;
+
+// The work section reads as one story, in the same order as the services:
+// a home (room by room), then commercial and hospitality spaces, then a building
+// from the outside in, then a design revision. Each image appears once.
+const carouselIds = [
+  "bright-living-room",
+  "navy-living-room",
+  "living-passage",
+  "open-plan-dining",
+  "parallel-kitchen",
+  "marble-suite-bedroom",
+  "vanity-bedroom",
   "tailored-bedroom",
-  "indoor-outdoor-lounge",
-  "lift-lobby",
-  "high-rise-exterior-day",
-  "childrens-bedroom",
+  "upholstered-bedroom",
+  "modern-bedroom",
+];
+const carouselItems = carouselIds.map(byId).filter(Boolean);
+const commercialPair = ["executive-office", "indoor-outdoor-lounge"].map(byId);
+const lobbyPair = ["lift-lobby", "arrival-lobby"].map(byId);
+const dayItem = byId("high-rise-exterior-day");
+const nightItem = byId("high-rise-exterior-night");
+
+const shownIds = new Set([
+  ...carouselIds,
+  ...commercialPair.map((item) => item.id),
+  ...lobbyPair.map((item) => item.id),
+  dayItem.id,
+  nightItem.id,
+  "walnut-bedroom",
 ]);
 
-const featuredItems = [
-  "tailored-bedroom",
-  "indoor-outdoor-lounge",
-  "lift-lobby",
-  "high-rise-exterior-day",
-  "childrens-bedroom",
-].map((id) => portfolioItems.find((item) => item.id === id)!).filter(Boolean);
+// Archive follows the same hierarchy: residential room by room, then commercial,
+// exterior and lobby work.
+const categoryOrder: PortfolioCategory[] = ["residential", "commercial", "exterior", "lobby"];
+const roomOrder: Partial<Record<PortfolioCategory, RegExp[]>> = {
+  residential: [/children|kids|bunk|football/i, /living|lounge|passage/i, /dining/i, /kitchen/i, /bedroom|vanity|palette/i, /bath/i],
+  commercial: [/office|cabin|conference|reception desk|office reception/i, /reception/i, /lounge|bar|restaurant|booth|music|entertainment|sitting/i],
+};
+// Rank of each pattern in display order (kids rooms are matched first but shown after bedrooms).
+const displayRank: Partial<Record<PortfolioCategory, number[]>> = { residential: [4.5, 0, 1, 2, 4, 5] };
+const roomRank = (item: PortfolioItem) => {
+  const patterns = roomOrder[item.category] ?? [];
+  const index = patterns.findIndex((pattern) => pattern.test(item.title));
+  if (index === -1) return patterns.length + 1;
+  return displayRank[item.category]?.[index] ?? index;
+};
 
-const archiveItems = portfolioItems.filter((item) => !featuredIds.has(item.id));
+const ARCHIVE_PAGE = 15;
+const archivePreview = ["music-lounge", "marble-dining", "modern-villa", "conference-room"];
+
+const archiveItems = portfolioItems
+  .filter((item) => !shownIds.has(item.id))
+  .map((item, index) => ({ item, index }))
+  .sort((a, b) =>
+    categoryOrder.indexOf(a.item.category) - categoryOrder.indexOf(b.item.category)
+    || roomRank(a.item) - roomRank(b.item)
+    || a.index - b.index)
+  .map(({ item }) => item);
 
 const categoryLabel = (category: PortfolioCategory) =>
   portfolioCategories.find((item) => item.id === category)?.label ?? category;
@@ -71,12 +114,120 @@ function WorkCard({
             <Image src={item.image} alt={item.alt} fill sizes={variant === "paired" ? "(max-width: 767px) 100vw, 45vw" : "(max-width: 767px) 100vw, 82vw"} />
           </span>
         </span>
+        <span className="image-tag">{item.title}</span>
         <span className="portfolio-feature-card__view">View image <i aria-hidden="true">↗</i></span>
       </button>
-      <div className="portfolio-feature-card__caption">
-        <p>{categoryLabel(item.category)}</p>
-        <h3>{item.title}</h3>
-        <span>{item.descriptor}</span>
+    </article>
+  );
+}
+
+function WorkChapter({ children }: { children: ReactNode }) {
+  return <p className="work-chapter"><span>{children}</span><i aria-hidden="true" /></p>;
+}
+
+function WorkCarousel({ onOpen }: { onOpen: (item: PortfolioItem, trigger: HTMLElement) => void }) {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = carouselItems.length;
+  const go = (next: number) => setCurrent((next + count) % count);
+
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setTimeout(() => setCurrent((value) => (value + 1) % count), 4500);
+    return () => window.clearTimeout(timer);
+  }, [current, paused, count]);
+
+  return (
+    <article
+      className="portfolio-feature-card portfolio-feature-card--lead work-carousel"
+      aria-roledescription="carousel"
+      aria-label="Residential visualizations"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      <div className="portfolio-feature-card__image work-carousel__frame">
+        <span className="portfolio-feature-card__media">
+          <span className="portfolio-feature-card__entrance">
+            {carouselItems.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`work-carousel__slide${index === current ? " is-active" : ""}`}
+                style={imageVariables(item)}
+                onClick={(event) => onOpen(item, event.currentTarget)}
+                aria-hidden={index !== current}
+                tabIndex={index === current ? 0 : -1}
+                aria-label={`Open ${item.title}`}
+              >
+                <Image src={item.image} alt={item.alt} fill sizes="(max-width: 767px) 100vw, 82vw" priority={index === 0} />
+              </button>
+            ))}
+          </span>
+        </span>
+        <span className="image-tag" aria-live="polite">{carouselItems[current].title}</span>
+        <button type="button" className="work-carousel__arrow work-carousel__arrow--prev" onClick={() => go(current - 1)} aria-label="Previous image">←</button>
+        <button type="button" className="work-carousel__arrow work-carousel__arrow--next" onClick={() => go(current + 1)} aria-label="Next image">→</button>
+        <div className="work-carousel__dots">
+          {carouselItems.map((item, index) => (
+            <button key={item.id} type="button" className={index === current ? "is-active" : ""} onClick={() => go(index)} aria-label={`Show image ${index + 1}`} aria-current={index === current} />
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+const beforeAfterPairs = [
+  { id: "wardrobe", label: "Wardrobe", before: imageById("beforeWardrobe"), after: imageById("walnutBedroom") },
+  { id: "ceiling", label: "Ceiling", before: imageById("beforeCeiling"), after: imageById("walnutBedroom") },
+] as const;
+
+function BeforeAfter() {
+  const [pairIndex, setPairIndex] = useState(0);
+  const [split, setSplit] = useState(50);
+  const tween = useRef<gsap.core.Tween | null>(null);
+  const pair = beforeAfterPairs[pairIndex];
+
+  useEffect(() => () => { tween.current?.kill(); }, []);
+
+  const animateTo = (target: number) => {
+    tween.current?.kill();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSplit(target);
+      return;
+    }
+    const value = { current: split };
+    tween.current = gsap.to(value, {
+      current: target,
+      duration: 0.38,
+      ease: "power2.inOut",
+      onUpdate: () => setSplit(Math.round(value.current * 10) / 10),
+    });
+  };
+
+  return (
+    <article className="portfolio-feature-card portfolio-feature-card--exterior portfolio-before-after">
+      <div className="portfolio-comparison portfolio-comparison--wide">
+        <Image src={pair.after.src} alt={pair.after.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+        <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
+          <Image key={pair.id} src={pair.before.src} alt={pair.before.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+        </div>
+        <span className="portfolio-comparison__label portfolio-comparison__label--day">Before</span>
+        <span className="portfolio-comparison__label portfolio-comparison__label--night">After</span>
+        <span className="portfolio-comparison__line" style={{ left: `${split}%` }} aria-hidden="true" />
+        <input type="range" min="0" max="100" value={split} onPointerDown={() => tween.current?.kill()} onChange={(event) => { tween.current?.kill(); setSplit(Number(event.target.value)); }} aria-label="Compare before and after design" aria-valuetext={`${Math.round(split)}% before, ${Math.round(100 - split)}% after`} />
+      </div>
+      <div className="portfolio-comparison__caption">
+        <div><h3>Bedroom — Before / After</h3></div>
+        <div className="portfolio-comparison__controls" aria-label="Before and after controls">
+          {beforeAfterPairs.map((item, index) => (
+            <button key={item.id} type="button" aria-pressed={pairIndex === index} onClick={() => { setPairIndex(index); animateTo(50); }}>{item.label}</button>
+          ))}
+          <button type="button" aria-pressed={split === 100} onClick={() => animateTo(100)}>Show before</button>
+          <button type="button" aria-pressed={split === 0} onClick={() => animateTo(0)}>Show after</button>
+        </div>
       </div>
     </article>
   );
@@ -203,13 +354,14 @@ export function PortfolioExhibition() {
   const [archiveMounted, setArchiveMounted] = useState(false);
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [renderedArchive, setRenderedArchive] = useState(archiveItems);
+  const [visibleCount, setVisibleCount] = useState(ARCHIVE_PAGE);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [compare, setCompare] = useState(50);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  useEffect(() => () => compareTween.current?.kill(), []);
+  useEffect(() => () => { compareTween.current?.kill(); }, []);
 
   useEffect(() => {
     if (!archiveMounted || !archive.current) return;
@@ -243,28 +395,18 @@ export function PortfolioExhibition() {
           if (!conditions?.motion) return;
 
           gsap.timeline({
-            scrollTrigger: { trigger: ".portfolio-intro", start: "top 80%", once: true },
-            defaults: { ease: "power3.out" },
-          })
-            .from(".portfolio-intro > span", { y: 12, opacity: 0, duration: 0.52 })
-            .from(".portfolio-intro h2", { y: 24, opacity: 0, duration: 0.72 }, "-=0.32")
-            .from(".portfolio-intro > p", { y: 14, opacity: 0, duration: 0.58 }, "-=0.42");
-
-          gsap.timeline({
             scrollTrigger: { trigger: ".portfolio-feature-card--lead", start: "top 82%", once: true },
             defaults: { ease: "power3.out" },
           })
             .from(".portfolio-feature-card--lead .portfolio-feature-card__image", { clipPath: "inset(4% 4% 4% 4%)", duration: 1.05, ease: "power2.inOut" })
-            .from(".portfolio-feature-card--lead .portfolio-feature-card__entrance", { scale: 1.045, duration: 1.08 }, 0)
-            .from(".portfolio-feature-card--lead .portfolio-feature-card__caption", { y: 16, opacity: 0, duration: 0.58 }, "-=0.42");
+            .from(".portfolio-feature-card--lead .portfolio-feature-card__entrance", { scale: 1.045, duration: 1.08 }, 0);
 
           gsap.timeline({
             scrollTrigger: { trigger: ".portfolio-feature-pair", start: "top 82%", once: true },
             defaults: { ease: "power3.out" },
           })
             .from(".portfolio-feature-pair .portfolio-feature-card__image", { clipPath: "inset(3% 3% 3% 3%)", duration: 0.88, stagger: 0.1, ease: "power2.inOut" })
-            .from(".portfolio-feature-pair .portfolio-feature-card__entrance", { scale: 1.035, duration: 0.9, stagger: 0.1 }, 0)
-            .from(".portfolio-feature-pair .portfolio-feature-card__caption", { y: 13, opacity: 0, duration: 0.55, stagger: 0.1 }, "-=0.5");
+            .from(".portfolio-feature-pair .portfolio-feature-card__entrance", { scale: 1.035, duration: 0.9, stagger: 0.1 }, 0);
 
           gsap.from(".portfolio-feature-card--exterior", {
             y: 18,
@@ -273,21 +415,6 @@ export function PortfolioExhibition() {
             ease: "power3.out",
             scrollTrigger: { trigger: ".portfolio-feature-card--exterior", start: "top 84%", once: true },
           });
-          gsap.from(".portfolio-feature-card--closing", {
-            y: 14,
-            opacity: 0,
-            duration: 0.68,
-            ease: "power3.out",
-            scrollTrigger: { trigger: ".portfolio-feature-card--closing", start: "top 84%", once: true },
-          });
-
-          gsap.timeline({
-            scrollTrigger: { trigger: ".portfolio-exit", start: "top 88%", once: true },
-            defaults: { ease: "power3.out" },
-          })
-            .from(".portfolio-exit__rule", { scaleX: 0, duration: 0.72, ease: "power2.inOut" })
-            .from(".portfolio-exit p", { y: 14, opacity: 0, duration: 0.62 }, "-=0.42")
-            .from(".portfolio-exit__inner > span", { opacity: 0, duration: 0.4, stagger: 0.07 }, "-=0.34");
 
           if (conditions.depth) {
             gsap.fromTo(
@@ -382,6 +509,7 @@ export function PortfolioExhibition() {
     const commit = () => {
       setCategory(next);
       setRenderedArchive(nextItems);
+      setVisibleCount(ARCHIVE_PAGE);
       requestAnimationFrame(() => {
         const cards = archiveGrid.current?.children;
         if (cards && !reduced) {
@@ -399,23 +527,24 @@ export function PortfolioExhibition() {
     gsap.to(grid.children, { opacity: 0, y: -5, duration: 0.16, stagger: 0.015, ease: "power1.in", overwrite: true, onComplete: commit });
   };
 
-  const dayItem = featuredItems[3];
-  const nightItem = portfolioItems.find((item) => item.id === "high-rise-exterior-night")!;
 
   return (
     <section id="projects" ref={section} className="portfolio-exhibition" aria-labelledby="portfolio-title">
-      <div className="site-container portfolio-intro">
-        <span>02 / Selected work</span>
-        <h2 id="portfolio-title">A concise edit of<br /><em>spaces made visible.</em></h2>
-        <p>Five compositions spanning residential, hospitality, exterior and lobby visualization.</p>
-      </div>
+      <header className="site-container work-head">
+        <h2 id="portfolio-title">Selected <em>work.</em></h2>
+        <p>Every space below began as a brief, a plan and a mood board.</p>
+      </header>
 
       <div className="site-container portfolio-feature-grid">
-        <WorkCard item={featuredItems[0]} variant="lead" onOpen={openViewer} />
+        <WorkChapter>Residential</WorkChapter>
+        <WorkCarousel onOpen={openViewer} />
+
+        <WorkChapter>Commercial &amp; Hospitality</WorkChapter>
         <div className="portfolio-feature-pair">
-          <WorkCard item={featuredItems[1]} variant="paired" onOpen={openViewer} />
-          <WorkCard item={featuredItems[2]} variant="paired" onOpen={openViewer} />
+          {commercialPair.map((item) => <WorkCard key={item.id} item={item} variant="paired" onOpen={openViewer} />)}
         </div>
+
+        <WorkChapter>Exterior &amp; Lobby</WorkChapter>
 
         <article className="portfolio-feature-card portfolio-feature-card--exterior">
           <div className="portfolio-comparison">
@@ -429,7 +558,7 @@ export function PortfolioExhibition() {
             <input type="range" min="0" max="100" value={compare} onPointerDown={() => compareTween.current?.kill()} onChange={(event) => setComparison(Number(event.target.value))} aria-label="Compare day and night views of the same exterior" aria-valuetext={`${Math.round(compare)}% day, ${Math.round(100 - compare)}% night`} />
           </div>
           <div className="portfolio-comparison__caption">
-            <div><p>{categoryLabel(dayItem.category)}</p><h3>High-Rise Exterior — Day / Night</h3><span>One exterior composition shown across two lighting conditions.</span></div>
+            <div><h3>High-Rise Exterior — Day / Night</h3><span>One exterior composition shown across two lighting conditions.</span></div>
             <div className="portfolio-comparison__controls" aria-label="Comparison controls">
               <button type="button" aria-pressed={compare === 100} onClick={() => animateComparison(100)}>Show day</button>
               <button type="button" aria-pressed={compare === 0} onClick={() => animateComparison(0)}>Show night</button>
@@ -438,11 +567,25 @@ export function PortfolioExhibition() {
           </div>
         </article>
 
-        <WorkCard item={featuredItems[4]} variant="closing" onOpen={openViewer} />
+        <div className="portfolio-feature-pair portfolio-feature-pair--lobby">
+          {lobbyPair.map((item) => <WorkCard key={item.id} item={item} variant="paired" onOpen={openViewer} />)}
+        </div>
+
+        <WorkChapter>Design evolution</WorkChapter>
+        <BeforeAfter />
       </div>
 
       <div className="site-container portfolio-archive-entry">
-        <div><span>Wider archive</span><p>{archiveItems.length} additional visual studies spanning residential, hospitality, exterior and lobby work.</p></div>
+        <div className="portfolio-archive-entry__previews" aria-hidden="true">
+          {archivePreview.map((id) => archiveItems.find((item) => item.id === id)).filter(Boolean).map((item) => (
+            <span key={item!.id}><Image src={item!.image} alt="" fill sizes="96px" /></span>
+          ))}
+          <span className="portfolio-archive-entry__more">+{archiveItems.length - archivePreview.length}</span>
+        </div>
+        <div className="portfolio-archive-entry__text">
+          <h3>Wider archive</h3>
+          <p>{archiveItems.length} more visuals across residential, commercial, exterior and lobby work.</p>
+        </div>
         <button type="button" onClick={toggleArchive} aria-expanded={expanded} aria-controls="portfolio-archive">
           {expanded ? "Close archive" : "View all visuals"}<span aria-hidden="true">{expanded ? "−" : "+"}</span>
         </button>
@@ -461,24 +604,26 @@ export function PortfolioExhibition() {
             })}
           </div>
           <div ref={archiveGrid} className="site-container portfolio-archive-grid">
-            {renderedArchive.map((item) => (
+            {renderedArchive.slice(0, visibleCount).map((item) => (
               <article key={item.id} className="portfolio-archive-card" style={imageVariables(item)}>
                 <button type="button" className="portfolio-archive-card__image" onClick={(event) => openViewer(item, event.currentTarget)} aria-label={`Open ${item.title}`}>
                   <Image src={item.image} alt={item.alt} fill sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw" />
                 </button>
-                <div><p>{categoryLabel(item.category)}</p><h3>{item.title}</h3></div>
+                <div><h3>{item.title}</h3></div>
               </article>
             ))}
+          </div>
+          <div className="site-container portfolio-archive-more">
+            <p>Showing {Math.min(visibleCount, renderedArchive.length)} of {renderedArchive.length}</p>
+            {visibleCount < renderedArchive.length && (
+              <button type="button" onClick={() => { setVisibleCount((count) => count + ARCHIVE_PAGE); requestAnimationFrame(() => ScrollTrigger.refresh()); }}>
+                Load more <span aria-hidden="true">+</span>
+              </button>
+            )}
           </div>
         </div>
       )}
 
-      <div className="portfolio-exit">
-        <div className="site-container portfolio-exit__inner">
-          <i className="portfolio-exit__rule" aria-hidden="true" />
-          <span>Next / Capabilities</span><p>From image to <em>support.</em></p><span>Six ways to make design visible</span>
-        </div>
-      </div>
 
       {mounted && viewerIndex !== null && (
         <PortfolioViewer index={viewerIndex} onClose={closeViewer} onChange={setViewerIndex} />

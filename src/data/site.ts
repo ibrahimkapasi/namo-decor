@@ -1,9 +1,10 @@
 import { imageById } from "./image-manifest";
 
 export const navigation = [
-  { label: "Work", href: "#projects" },
-  { label: "Services", href: "#services" },
   { label: "Studio", href: "#about" },
+  { label: "Services", href: "#services" },
+  { label: "Process", href: "#process" },
+  { label: "Work", href: "#projects" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -24,4 +25,5 @@ export const founder = {
 
 export const heroImages = {
   primary: imageById("hospitalityBarHero"),
+  detail: imageById("towerNightPortrait"),
 };
