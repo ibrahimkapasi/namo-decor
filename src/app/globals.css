@@ -1686,3 +1686,10 @@ svg { display: block; }
 .portfolio-before-after .portfolio-comparison__label { top:.9rem; border-radius:999px; padding:.35rem .75rem; background:rgba(17,16,14,.72); color:#fff; text-shadow:none; font-size:.7rem; letter-spacing:.06em; backdrop-filter:blur(6px); }
 .portfolio-before-after .portfolio-comparison__label--day { left:.9rem; } .portfolio-before-after .portfolio-comparison__label--night { right:.9rem; }
 .portfolio-before-after .portfolio-comparison { background:#fff; }
+
+/* Paired cards: equal size, aligned to the grid */
+.portfolio-feature-pair { align-items:start; margin-top:0; margin-left:0; }
+.portfolio-feature-card--paired .portfolio-feature-card__image { aspect-ratio:4 / 3; max-height:none; }
+.portfolio-feature-card--paired .portfolio-feature-card__image img { object-position:50% 50%; }
+.portfolio-feature-pair--lobby { margin-top:clamp(1.25rem,3vw,3rem); }
+@media (max-width:767px) { .portfolio-feature-pair { gap:1.25rem; margin:0; } }
