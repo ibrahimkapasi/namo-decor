@@ -576,7 +576,7 @@ export const imageManifest = {
     focalPoint: "Interior mood board", textSafeArea: "none", apparentQuality: "large",
   },
   kitchenBefore: {
-    src: "/images/portfolio/kitchen-before-aligned.webp", width: 2400, height: 1350,
+    src: "/images/portfolio/kitchen-before-sharp.webp", width: 2400, height: 1350,
     alt: "2D elevation drawing of a kitchen showing refrigerator, oven, OTG, shutters, loft, dado and drawer dimensions",
     category: "residential-interior", label: "Kitchen elevation drawing", placements: ["portfolio-feature"],
     crop: { desktop: { aspectRatio: "16 / 9", objectPosition: "50% 50%" }, mobile: { aspectRatio: "16 / 9", objectPosition: "50% 50%" } },

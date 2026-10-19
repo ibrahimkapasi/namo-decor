@@ -208,9 +208,9 @@ function BeforeAfter() {
   return (
     <article className="portfolio-feature-card portfolio-feature-card--exterior portfolio-before-after">
       <div className="portfolio-comparison portfolio-comparison--wide">
-        <Image src={pair.after.src} alt={pair.after.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+        <Image src={pair.after.src} alt={pair.after.alt} fill sizes="(max-width: 767px) 100vw, 75vw" quality={92} />
         <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
-          <Image key={pair.id} src={pair.before.src} alt={pair.before.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
+          <Image key={pair.id} src={pair.before.src} alt={pair.before.alt} fill sizes="(max-width: 767px) 100vw, 75vw" quality={92} />
         </div>
         <span className="portfolio-comparison__label portfolio-comparison__label--day">Before · 2D drawing</span>
         <span className="portfolio-comparison__label portfolio-comparison__label--night">After · 3D render</span>
