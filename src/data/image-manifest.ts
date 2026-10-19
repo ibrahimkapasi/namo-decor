@@ -561,20 +561,6 @@ export const imageManifest = {
     crop: { desktop: { aspectRatio: "1175 / 1969", objectPosition: "50% 50%" }, mobile: { aspectRatio: "4 / 5", objectPosition: "50% 50%" } },
     focalPoint: "Townhouse Facade", textSafeArea: "none", apparentQuality: "large",
   },
-  beforeWardrobe: {
-    src: "/images/portfolio/before-wardrobe.webp", width: 2400, height: 1350,
-    alt: "3D visualization of a bedroom design option with plain taupe wardrobes either side of a walnut headboard niche",
-    category: "residential-interior", label: "Bedroom, earlier wardrobe option", placements: ["portfolio-archive"],
-    crop: { desktop: { aspectRatio: "2400 / 1350", objectPosition: "50% 50%" }, mobile: { aspectRatio: "4 / 5", objectPosition: "50% 50%" } },
-    focalPoint: "Bedroom, earlier wardrobe option", textSafeArea: "none", apparentQuality: "large",
-  },
-  beforeCeiling: {
-    src: "/images/portfolio/before-ceiling.webp", width: 2400, height: 1350,
-    alt: "3D visualization of a bedroom design option with a stepped cove ceiling and recessed downlights",
-    category: "residential-interior", label: "Bedroom, earlier ceiling option", placements: ["portfolio-archive"],
-    crop: { desktop: { aspectRatio: "2400 / 1350", objectPosition: "50% 50%" }, mobile: { aspectRatio: "4 / 5", objectPosition: "50% 50%" } },
-    focalPoint: "Bedroom, earlier ceiling option", textSafeArea: "none", apparentQuality: "large",
-  },
   planSample: {
     src: "/images/portfolio/plan-sample.webp", width: 734, height: 768,
     alt: "Rendered 2D floor plan of an apartment showing furnished bedrooms, living, dining and kitchen",
@@ -588,6 +574,20 @@ export const imageManifest = {
     category: "residential-interior", label: "Interior mood board", placements: ["portfolio-archive"],
     crop: { desktop: { aspectRatio: "736 / 1308", objectPosition: "50% 50%" }, mobile: { aspectRatio: "4 / 5", objectPosition: "50% 50%" } },
     focalPoint: "Interior mood board", textSafeArea: "none", apparentQuality: "large",
+  },
+  kitchenBefore: {
+    src: "/images/portfolio/kitchen-before.webp", width: 2400, height: 1350,
+    alt: "2D elevation drawing of a kitchen showing refrigerator, oven, OTG, shutters, loft, dado and drawer dimensions",
+    category: "residential-interior", label: "Kitchen elevation drawing", placements: ["portfolio-feature"],
+    crop: { desktop: { aspectRatio: "16 / 9", objectPosition: "50% 50%" }, mobile: { aspectRatio: "16 / 9", objectPosition: "50% 50%" } },
+    focalPoint: "Full kitchen elevation", textSafeArea: "none", apparentQuality: "large",
+  },
+  kitchenAfter: {
+    src: "/images/portfolio/kitchen-after.webp", width: 2400, height: 1350,
+    alt: "3D visualization of the same kitchen with taupe gloss cabinets, fluted glass shutters, teal tile dado and built-in ovens",
+    category: "residential-interior", label: "Kitchen 3D render", placements: ["portfolio-feature"],
+    crop: { desktop: { aspectRatio: "16 / 9", objectPosition: "50% 50%" }, mobile: { aspectRatio: "16 / 9", objectPosition: "50% 50%" } },
+    focalPoint: "Full kitchen run", textSafeArea: "none", apparentQuality: "hero-ready",
   },
   founderPortrait: {
     src: "/images/1D5A2423.JPG.jpeg", width: 1500, height: 2250,

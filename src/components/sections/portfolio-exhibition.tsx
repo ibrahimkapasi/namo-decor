@@ -57,7 +57,6 @@ const shownIds = new Set([
   ...lobbyPair.map((item) => item.id),
   dayItem.id,
   nightItem.id,
-  "walnut-bedroom",
 ]);
 
 // Archive follows the same hierarchy: residential room by room, then commercial,
@@ -180,8 +179,7 @@ function WorkCarousel({ onOpen }: { onOpen: (item: PortfolioItem, trigger: HTMLE
 }
 
 const beforeAfterPairs = [
-  { id: "wardrobe", label: "Wardrobe", before: imageById("beforeWardrobe"), after: imageById("walnutBedroom") },
-  { id: "ceiling", label: "Ceiling", before: imageById("beforeCeiling"), after: imageById("walnutBedroom") },
+  { id: "kitchen", label: "Kitchen", before: imageById("kitchenBefore"), after: imageById("kitchenAfter") },
 ] as const;
 
 function BeforeAfter() {
@@ -214,15 +212,15 @@ function BeforeAfter() {
         <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
           <Image key={pair.id} src={pair.before.src} alt={pair.before.alt} fill sizes="(max-width: 767px) 100vw, 62vw" />
         </div>
-        <span className="portfolio-comparison__label portfolio-comparison__label--day">Before</span>
-        <span className="portfolio-comparison__label portfolio-comparison__label--night">After</span>
+        <span className="portfolio-comparison__label portfolio-comparison__label--day">Before · 2D drawing</span>
+        <span className="portfolio-comparison__label portfolio-comparison__label--night">After · 3D render</span>
         <span className="portfolio-comparison__line" style={{ left: `${split}%` }} aria-hidden="true" />
         <input type="range" min="0" max="100" value={split} onPointerDown={() => tween.current?.kill()} onChange={(event) => { tween.current?.kill(); setSplit(Number(event.target.value)); }} aria-label="Compare before and after design" aria-valuetext={`${Math.round(split)}% before, ${Math.round(100 - split)}% after`} />
       </div>
       <div className="portfolio-comparison__caption">
-        <div><h3>Bedroom — Before / After</h3></div>
+        <div><h3>Kitchen — Before / After</h3></div>
         <div className="portfolio-comparison__controls" aria-label="Before and after controls">
-          {beforeAfterPairs.map((item, index) => (
+          {beforeAfterPairs.length > 1 && beforeAfterPairs.map((item, index) => (
             <button key={item.id} type="button" aria-pressed={pairIndex === index} onClick={() => { setPairIndex(index); animateTo(50); }}>{item.label}</button>
           ))}
           <button type="button" aria-pressed={split === 100} onClick={() => animateTo(100)}>Show before</button>
