@@ -1674,3 +1674,12 @@ svg { display: block; }
   .contact-meta > div:last-child { grid-column:auto; }
   .portfolio-comparison__controls button { flex:1 1 auto; }
 }
+
+/* Mobile hero: no forced full-height block under the image; spaced stat rows */
+@media (max-width:767px) {
+  .hero-exhibition-layout { display:block; min-height:0; padding-top:1.75rem; padding-bottom:2rem; }
+  .hero-primary-plane { height:clamp(16rem,48svh,26rem); }
+  .hero-stats { margin-top:2rem; padding-top:1.5rem; row-gap:0; }
+  .hero-stats > div,.hero-stats > div + div { padding:0 .75rem 1.25rem 0; border:0; }
+  .hero-stats > div:nth-child(n+3) { padding-top:1.25rem; border-top:1px solid rgba(255,255,255,.12); }
+}
