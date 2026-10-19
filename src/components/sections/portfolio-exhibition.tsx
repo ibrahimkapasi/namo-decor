@@ -212,8 +212,6 @@ function BeforeAfter() {
         <div className="portfolio-comparison__day" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
           <Image key={pair.id} src={pair.before.src} alt={pair.before.alt} fill sizes="(max-width: 767px) 100vw, 75vw" quality={92} />
         </div>
-        <span className="portfolio-comparison__label portfolio-comparison__label--day">Before · 2D drawing</span>
-        <span className="portfolio-comparison__label portfolio-comparison__label--night">After · 3D render</span>
         <span className="portfolio-comparison__line" style={{ left: `${split}%` }} aria-hidden="true" />
         <input type="range" min="0" max="100" value={split} onPointerDown={() => tween.current?.kill()} onChange={(event) => { tween.current?.kill(); setSplit(Number(event.target.value)); }} aria-label="Compare before and after design" aria-valuetext={`${Math.round(split)}% before, ${Math.round(100 - split)}% after`} />
       </div>
